@@ -1,22 +1,22 @@
 #include <curses.h>
 #include <stdlib.h>
 
-#define ENTER 10
-#define ESCAPE 27
-
+#define ENTER 	10
+#define ESCAPE 	27
+#define LEN	4
 void init_curses(){
         initscr();
         start_color();
-        init_pair(1,COLOR_WHITE,COLOR_BLUE);
+        init_pair(1,COLOR_GREEN,COLOR_BLUE);
         init_pair(2,COLOR_BLUE,COLOR_WHITE);
-        init_pair(3,COLOR_RED,COLOR_WHITE);
+        init_pair(3,COLOR_WHITE,COLOR_BLUE);
         curs_set(0);
         noecho();
         keypad(stdscr,TRUE);
 }
 
 void draw_menubar(WINDOW *menubar){
-        wbkgd(menubar,COLOR_PAIR(2));
+        wbkgd(menubar,COLOR_PAIR(1));
         waddstr(menubar,"File");
         wattron(menubar,COLOR_PAIR(3));
         waddstr(menubar,"(F1)");
@@ -28,24 +28,24 @@ void draw_menubar(WINDOW *menubar){
         wattroff(menubar,COLOR_PAIR(3));
 }
 WINDOW **draw_menu(int start_col){
+
+char *fname[] = { "Nuovo ",
+                  "Salva",
+		  "Info",
+		  "Esci"
+		};
+//char app[];
         int i;
         WINDOW **items;
-        items=(WINDOW **)malloc(9*sizeof(WINDOW *));
-
+        items=(WINDOW **)malloc(LEN*sizeof(WINDOW *));
         items[0]=newwin(10,19,1,start_col);
         wbkgd(items[0],COLOR_PAIR(2));
         box(items[0],ACS_VLINE,ACS_HLINE);
-        items[1]=subwin(items[0],1,17,2,start_col+1);
-        items[2]=subwin(items[0],1,17,3,start_col+1);
-        items[3]=subwin(items[0],1,17,4,start_col+1);
-        items[4]=subwin(items[0],1,17,5,start_col+1);
-        items[5]=subwin(items[0],1,17,6,start_col+1);
-        items[6]=subwin(items[0],1,17,7,start_col+1);
-        items[7]=subwin(items[0],1,17,8,start_col+1);
-        items[8]=subwin(items[0],1,17,9,start_col+1);
-        for (i=1;i<9;i++)
-                wprintw(items[i],"Voce %d",i);
-        wbkgd(items[1],COLOR_PAIR(1));
+        for (i=1;i<LEN+1;i++){
+		items[i]=subwin(items[0],1,17,i+1,start_col+1);     
+                wprintw(items[i],"%d %s",i,fname[i-1]);
+        }
+	wbkgd(items[1],COLOR_PAIR(1));
         wrefresh(items[0]);
         return items;
 }
@@ -108,11 +108,11 @@ int main(){
         wrefresh(messagebar);
         if (key==KEY_F(1)) {
             menu_items=draw_menu(0);
-            selected_item=scroll_menu(menu_items,8,0);
+            selected_item=scroll_menu(menu_items,LEN,0);
             delete_menu(menu_items,9);
             if (selected_item<0)
                 wprintw(messagebar,"You haven't selected any item.");
-            else if(selected_item==1){
+            else if(selected_item==4){
 		 delwin(menubar);
 		 delwin(messagebar);
     		 endwin();
@@ -125,7 +125,7 @@ int main(){
             refresh();
         } else if (key==KEY_F(2)) {
             menu_items=draw_menu(20);
-            selected_item=scroll_menu(menu_items,8,20);
+            selected_item=scroll_menu(menu_items,LEN,20);
             delete_menu(menu_items,9);
             if (selected_item<0)
                 wprintw(messagebar,"You haven't selected any item.");
