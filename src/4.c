@@ -96,7 +96,7 @@ int main(){
     messagebar=subwin(stdscr,1,79,23,1);
     draw_menubar(menubar);
     move(2,1);
-    printw("Press F1 or F2 to open the menus. ");
+    printw("PassKey 0.01 ");
     printw("ESC quits.");
     refresh();
 
